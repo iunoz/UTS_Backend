@@ -1,11 +1,26 @@
 const { User } = require('../../../models');
 
 /**
- * Get a list of users
+ * Get a list of users (pagination and filtering)
+ * @param {object} query - Query object
+ * @param {number} skip - Number of documents to skip
+ * @param {number} limit - Limit number or max number documents to return
+ * @param {object} sort - Sorting object
  * @returns {Promise}
  */
-async function getUsers() {
-  return User.find({});
+async function getUsers(query, skip, limit, sort) {
+  // ambil users dari database dgn filter, pagination dan sorting
+  return User.find(query).skip(skip).limit(limit).sort(sort);
+}
+
+/**
+ * Get total count of users based on search keyword
+ * @param {string} query - Query object
+ * @return {number} - Total count of users
+ */
+async function getUsersCount(query) {
+  // menghitung jumlah users yg sesuai dgn query
+  return User.countDocuments(query);
 }
 
 /**
@@ -83,6 +98,7 @@ async function changePassword(id, password) {
 
 module.exports = {
   getUsers,
+  getUsersCount,
   getUser,
   createUser,
   updateUser,

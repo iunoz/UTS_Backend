@@ -2,23 +2,64 @@ const usersRepository = require('./users-repository');
 const { hashPassword, passwordMatched } = require('../../../utils/password');
 
 /**
- * Get list of users
+ * Get list of users (pagination and filtering)
+ * @param {number} pageNumber - Page Number
+ * @param {number} pageSize - Page Size
+ * @param {string} sort - Sorting
+ * @param {string} search - Searching
  * @returns {Array}
  */
-async function getUsers() {
-  const users = await usersRepository.getUsers();
-
-  const results = [];
-  for (let i = 0; i < users.length; i += 1) {
-    const user = users[i];
-    results.push({
-      id: user.id,
-      name: user.name,
-      email: user.email,
-    });
+async function getUsers(pageNumber, pageSize, sort, search) {
+  // menghitung nilai skip utk pagination
+  const skip = (pageNumber - 1) * pageSize;
+  let query = {};
+  // membuat query jika adanya parameter
+  if (search) {
+    const [field, value] = search.split(':');
+    query[field] = { $regex: value, $options: 'i' };
+  }
+  // membust sortQuery utk mengurutkan data jika diberikan parameternya
+  let sortQuery = {};
+  if (sort) {
+    const [field, order] = sort.split(':');
+    sortQuery[field] = order === 'desc' ? -1 : 1;
   }
 
-  return results;
+  // mengambil users dari repo dgn filter, pagination, dan sorting yg benar
+  const users = await usersRepository.getUsers(
+    query,
+    skip,
+    pageSize,
+    sortQuery
+  );
+  return users;
+}
+
+/**
+ * Get total count of users based on search keyword
+ * @param {string} search - Search
+ * @return {number} - Total count of users
+ */
+async function getUsersCount(search) {
+  let query = {};
+
+  //membuat query jika adanya parameter
+  if (search) {
+    query = {
+      $or: [
+        {
+          name: { $regex: search, $options: 'i' },
+        },
+        {
+          email: { $regex: search, $options: 'i' },
+        },
+      ],
+    };
+  }
+
+  //menghitung total jumlah users yg sesuai dgn query
+  const total = await usersRepository.getUsersCount(query);
+  return total;
 }
 
 /**
@@ -163,6 +204,7 @@ async function changePassword(userId, password) {
 
 module.exports = {
   getUsers,
+  getUsersCount,
   getUser,
   createUser,
   updateUser,
