@@ -20,7 +20,7 @@ async function getUsers(query, skip, limit, sort) {
  */
 async function getUsersCount(query) {
   // menghitung jumlah users yg sesuai dgn query
-  return User.countDocuments(query);
+  return User.countDocuments(query); // User.countDocuments itu metode dlm mongoose utk menghitung jumlah docs
 }
 
 /**

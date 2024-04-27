@@ -16,7 +16,7 @@ async function getUsers(pageNumber, pageSize, sort, search) {
   // membuat query jika adanya parameter
   if (search) {
     const [field, value] = search.split(':');
-    query[field] = { $regex: value, $options: 'i' };
+    query[field] = { $regex: value, $options: 'i' }; //'i' berfungsi utk membuat suatu pencarian tidak sensitif (case sensitive)
   }
   // membust sortQuery utk mengurutkan data jika diberikan parameternya
   let sortQuery = {};
