@@ -10,17 +10,30 @@ const { hashPassword, passwordMatched } = require('../../../utils/password');
  * @returns {Array}
  */
 async function getUsers(pageNumber, pageSize, sort, search) {
+  // If pageNumber tidak diinput or atau invalid, pageNumber akan menampilkan semua pages/data
+  const pageNumberOrDefaultPageNumber =
+    pageNumber !== undefined ? parseInt(pageNumber) : 1;
+
+  // If pageSize tidak diinut or invalid, pageSize akan menampilkan semua data dalam satu page
+  let pageSizeOrDefaultpageSize =
+    pageSize !== undefined ? parseInt(pageSize) : null;
+
   // menghitung nilai skip utk pagination
-  const skip = (pageNumber - 1) * pageSize;
+  const skip = (pageNumberOrDefaultPageNumber - 1) * pageSizeOrDefaultpageSize;
   let query = {};
   // membuat query jika adanya parameter
   if (search) {
     const [field, value] = search.split(':');
     query[field] = { $regex: value, $options: 'i' }; //'i' berfungsi utk membuat suatu pencarian tidak sensitif (case sensitive)
   }
+
   // membust sortQuery utk mengurutkan data jika diberikan parameternya
   let sortQuery = {};
-  if (sort) {
+  //cek jika sort tidak dicantumkan atau salah format maka akan menampilkan data secara ascending dari email
+  if (!sort || typeof sort !== 'string' || sort.split(':').length !== 2) {
+    sortQuery = { email: 1 };
+    // jika data ada maka tampilkan sesuai yg diminta
+  } else {
     const [field, order] = sort.split(':');
     sortQuery[field] = order === 'desc' ? -1 : 1;
   }
@@ -29,7 +42,7 @@ async function getUsers(pageNumber, pageSize, sort, search) {
   const users = await usersRepository.getUsers(
     query,
     skip,
-    pageSize,
+    pageSizeOrDefaultpageSize === null ? undefined : pageSizeOrDefaultpageSize,
     sortQuery
   );
   return users;

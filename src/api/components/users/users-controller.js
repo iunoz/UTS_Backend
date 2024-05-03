@@ -11,7 +11,18 @@ const { errorResponder, errorTypes } = require('../../../core/errors');
 async function getUsers(request, response, next) {
   try {
     // cek paramater query dari request, jika gada, gunakan nilai default
-    const { page_number = 1, page_size = 10, sort, search } = request.query;
+    const { page_number, page_size, sort, search } = request.query;
+
+    //throw error jika pagenumber tidak undefine dan bukan bilangan integer
+    if (page_number !== undefined && !Number.isInteger(Number(page_number))) {
+      throw new Error('pageNumber must be an integer');
+    }
+
+    //throw error jika pagesize tidak undefined dan bukan bilangan integer
+    if (page_size !== undefined && !Number.isInteger(Number(page_size))) {
+      throw new Error('pageSize must be an integer');
+    }
+
     const users = await usersService.getUsers(
       page_number,
       page_size,
@@ -23,8 +34,8 @@ async function getUsers(request, response, next) {
     const totalPage = Math.ceil(totalCount / page_size);
     // lanjut dgn membuat informasi pagination dan data pengguna
     const responseData = {
-      page_number: page_number ? parseInt(page_number) : 1,
-      page_size: page_size ? parseInt(page_size) : 10,
+      page_number: parseInt(page_number),
+      page_size: page_size !== undefined ? parseInt(page_size) : null,
       count: users.length,
       total_pages: totalPage,
       has_previous_page: parseInt(page_number) > 1,
