@@ -19,19 +19,19 @@ async function login(request, response, next) {
     );
 
     if (loginSuccess) {
-      resetAttempt(email); //reset percobaan login ketika berhasil masuk
+      const reset = authenticationServices.resetAttempt(email); //reset percobaan login ketika berhasil masuk
       return response.status(200).json(loginSuccess);
     } else {
       const loginAttempt = authenticationServices.getAttempt(email);
       const timestamp = new Date(loginAttempt.timestamp).toISOString();
       if (loginAttempt.count < 5) {
         throw errorResponder(
-          errorTypes.FORBIDDEN,
+          errorTypes.INVALID_CREDENTIALS,
           `[${timestamp}] ${email} login failed. Attempt = ${loginAttempt.count}.`
         );
       } else if (loginAttempt.count === 5) {
         throw errorResponder(
-          errorTypes.FORBIDDEN,
+          errorTypes.INVALID_CREDENTIALS,
           `[${timestamp}] ${email} login failed. Attempt = ${loginAttempt.count}. Limit Reached`
         );
       } else {

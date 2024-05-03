@@ -23,8 +23,8 @@ async function getUsers(request, response, next) {
     const totalPage = Math.ceil(totalCount / page_size);
     // lanjut dgn membuat informasi pagination dan data pengguna
     const responseData = {
-      page_number: parseInt(page_number),
-      page_size: parseInt(page_size),
+      page_number: page_number ? parseInt(page_number) : 1,
+      page_size: page_size ? parseInt(page_size) : 10,
       count: users.length,
       total_pages: totalPage,
       has_previous_page: parseInt(page_number) > 1,
