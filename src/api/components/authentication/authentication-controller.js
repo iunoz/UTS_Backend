@@ -17,27 +17,21 @@ async function login(request, response, next) {
       email,
       password
     );
+    const loginAttempt = authenticationServices.getAttempt(email);
+    const timestamp = new Date(loginAttempt.timestamp).toISOString();
 
     if (loginSuccess) {
-      const reset = authenticationServices.resetAttempt(email); //reset percobaan login ketika berhasil masuk
       return response.status(200).json(loginSuccess);
     } else {
-      const loginAttempt = authenticationServices.getAttempt(email);
-      const timestamp = new Date(loginAttempt.timestamp).toISOString();
       if (loginAttempt.count < 5) {
         throw errorResponder(
           errorTypes.INVALID_CREDENTIALS,
           `[${timestamp}] ${email} login failed. Attempt = ${loginAttempt.count}.`
         );
-      } else if (loginAttempt.count === 5) {
-        throw errorResponder(
-          errorTypes.INVALID_CREDENTIALS,
-          `[${timestamp}] ${email} login failed. Attempt = ${loginAttempt.count}. Limit Reached`
-        );
       } else {
         throw errorResponder(
           errorTypes.FORBIDDEN,
-          `Too many login attempts. Try again later!!!`
+          `[${timestamp}] ${email} login failed. Attempt = ${loginAttempt.count}. Limit Reach. Account locked for 30 minutes!!!`
         );
       }
     }

@@ -55,6 +55,16 @@ async function checkLoginCredentials(email, password) {
   const userPassword = user ? user.password : '<RANDOM_PASSWORD_FILLER>';
   const passwordChecked = await passwordMatched(password, userPassword);
 
+  const attempt = getAttempt(email);
+
+  //jika percobaan login melebihi batas dan masih dalam waktu timeout
+  if (
+    attempt.count >= maxAttempt &&
+    Date.now() - attempt.timestamp < timeoutAttempt
+  ) {
+    return false; //mengembalikan false untuk menandakan akun terkunci
+  }
+
   // Because we always check the password (see above comment), we define the
   // login attempt as successful when the `user` is found (by email) and
   // the password matches.
@@ -74,9 +84,9 @@ async function checkLoginCredentials(email, password) {
     //cek apakah percobaan loginnya melebihi batas
     if (
       attempt.count >= maxAttempt &&
-      Date.now() - attempt.timestamp < timeoutAttempt
+      Date.now() - attempt.timestamp >= timeoutAttempt
     ) {
-      return false; // jika iya, return false utk menandakan percobaan login yg melebihi batas
+      resetAttempt(email); //jika melebihi batas tapi waktu timeout sudah lewat, reset percobaan
     }
     return false; //Menandakan jika login gagal
   }
