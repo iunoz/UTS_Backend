@@ -9,8 +9,11 @@ const { User } = require('../../../models');
  * @returns {Promise}
  */
 async function getUsers(query, skip, limit, sort) {
-  // ambil users dari database dgn filter, pagination dan sorting
-  return User.find(query).skip(skip).limit(limit).sort(sort);
+  // ambil users dari database tapi query hanya menampilkan id, name, dan email saja
+  return User.find(query, { _id: 1, name: 1, email: 1 })
+    .skip(skip)
+    .limit(limit)
+    .sort(sort);
 }
 
 /**
