@@ -62,4 +62,20 @@ module.exports = (app) => {
     celebrate(bankAccountsValidator.changePinCode),
     bankAccountsControllers.changePinCode
   );
+
+  //Deposit
+  route.post(
+    '/:id/deposit',
+    bankAuthenticationMiddleware,
+    celebrate(bankAccountsValidator.deposit),
+    bankAccountsControllers.deposit
+  );
+
+  //Transfer
+  route.post(
+    '/transfer',
+    bankAuthenticationMiddleware,
+    celebrate(bankAccountsValidator.transfer),
+    bankAccountsControllers.transfer
+  );
 };

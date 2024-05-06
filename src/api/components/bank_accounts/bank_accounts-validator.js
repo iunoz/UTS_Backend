@@ -50,4 +50,24 @@ module.exports = {
       pin_code_confirm: joi.string().required().label('Pin Code Confirmation'),
     },
   },
+
+  deposit: {
+    body: {
+      amount: joi.number().positive().required().label('Amount'),
+    },
+  },
+
+  transfer: {
+    body: {
+      senderBankAccountId: joi
+        .string()
+        .required()
+        .label('Sender Bank Account ID'),
+      receiverBankAccountId: joi
+        .string()
+        .required()
+        .label('Receiver Bank Account ID'),
+      amount: joi.number().positive().required().label('Amount'),
+    },
+  },
 };

@@ -1,6 +1,5 @@
 const bankAccountsRepository = require('./bank_accounts-repository');
 const { hashPassword, passwordMatched } = require('../../../utils/password');
-const { account_number } = require('../../../models/bank_accounts-schema');
 
 /**
  * Get list of bank account
@@ -254,6 +253,73 @@ async function changePinCode(bankAccountId, pin_code) {
   return true;
 }
 
+/**
+ * Deposit amount into bank account
+ * @param {string} bankAccountId - Bank Account Id
+ * @param {number} amount - Amount to deposit
+ * @returns {boolean}
+ */
+async function deposit(bankAccountId, amount) {
+  const bankAccount =
+    await bankAccountsRepository.getBankAccount(bankAccountId);
+
+  if (!bankAccount) {
+    return null;
+  }
+
+  if (amount <= 0) {
+    return null;
+  }
+
+  const newBankAccountBalance = bankAccount.balance + amount;
+  await bankAccountsRepository.updateBankAccountBalance(bankAccountId, {
+    balance: newBankAccountBalance,
+  });
+  return true;
+}
+
+/**
+ * Transfer function to another bank
+ * @param {string} senderBankAccountId - Sender Id
+ * @param {string} receiverBankAccountId - Reveiver If=d
+ * @param {number} amount - Amount to transfer
+ * @return {boolean}
+ */
+async function transfer(senderBankAccountId, receiverBankAccountId, amount) {
+  const senderBankAccount =
+    await bankAccountsRepository.getBankAccount(senderBankAccountId);
+  if (!senderBankAccount) {
+    return null;
+  }
+
+  const receiverBankAccount = await bankAccountsRepository.getBankAccount(
+    receiverBankAccountId
+  );
+  if (!receiverBankAccount) {
+    return null;
+  }
+
+  if (amount <= 0) {
+    return null;
+  }
+
+  if (senderBankAccount.balance < amount) {
+    return null;
+  }
+
+  const newSenderBankAccountBalance = senderBankAccount.Balance - amount;
+  await bankAccountsRepository.updateBankAccountBalance(senderBankAccountId, {
+    balance: newSenderBankAccountBalance,
+  });
+
+  const newReceiverBankAccountBalance = receiverBankAccount.Balance - amount;
+  await bankAccountsRepository.updateBankAccountBalance(receiverBankAccountId, {
+    balance: newReceiverBankAccountBalance,
+  });
+
+  return true;
+}
+
 module.exports = {
   getBankAccounts,
   getBankAccount,
@@ -266,4 +332,6 @@ module.exports = {
   checkPinCode,
   changeAccessPassword,
   changePinCode,
+  deposit,
+  transfer,
 };

@@ -117,6 +117,23 @@ async function changePinCode(id, pin_code) {
   return BankAccount.updateOne({ _id: id }, { $set: { pin_code } });
 }
 
+/**
+ * Update existing bank account
+ * @param {string} id - Bank Account ID
+ * @param {object} balance - Amount of balance
+ * @returns {Promise}
+ */
+async function updateBankAccountBalance(id, balance) {
+  return BankAccount.updateOne(
+    {
+      _id: id,
+    },
+    {
+      $set: balance,
+    }
+  );
+}
+
 module.exports = {
   getBankAccounts,
   getBankAccount,
@@ -127,4 +144,5 @@ module.exports = {
   getBankAccountByPhoneNumber,
   changeAccessPassword,
   changePinCode,
+  updateBankAccountBalance,
 };

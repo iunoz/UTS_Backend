@@ -274,6 +274,74 @@ async function changePinCode(request, response, next) {
   }
 }
 
+/**
+ * Handle change bank account access password request
+ * @param {object} request - Express request object
+ * @param {object} response - Express response object
+ * @param {object} next - Express route middlewares
+ * @returns {object} Response object or pass an error to the next route
+ */
+async function deposit(request, response, next) {
+  const { id } = request.params;
+  const { amount } = request.body;
+
+  try {
+    if (amount <= 0) {
+      throw errorResponder(
+        errorTypes.INVALID_AMOUNT,
+        'Deposit amount cannot - or 0'
+      );
+    }
+
+    const success = await bankAccountsService.deposit(id, amount);
+    if (!success) {
+      throw errorResponder(
+        errorTypes.UNPROCESSABLE_ENTITY,
+        'Failed to deposit'
+      );
+    }
+
+    return response.status(200).json({ message: 'Deposit Successful' });
+  } catch (error) {
+    return next(error);
+  }
+}
+
+/**
+ * Handle change bank account access password request
+ * @param {object} request - Express request object
+ * @param {object} response - Express response object
+ * @param {object} next - Express route middlewares
+ * @returns {object} Response object or pass an error to the next route
+ */
+async function transfer(request, response, next) {
+  const { senderBankAccountId, receiverBankAccountId, amount } = request.body;
+
+  try {
+    if (amount <= 0) {
+      throw errorResponder(
+        errorTypes.UNPROCESSABLE_ENTITY,
+        'Failed to deposit'
+      );
+    }
+
+    const success = await bankAccountsService.transfer(
+      senderBankAccountId,
+      receiverBankAccountId,
+      amount
+    );
+    if (!success) {
+      throw errorResponder(
+        errorTypes.UNPROCESSABLE_ENTITY,
+        'Failed to deposit'
+      );
+    }
+    return response.status(200).json({ message: 'Transfer Successful' });
+  } catch (error) {
+    return next(error);
+  }
+}
+
 module.exports = {
   getBankAccounts,
   getBankAccount,
@@ -282,4 +350,6 @@ module.exports = {
   deleteBankAccount,
   changeAccessPassword,
   changePinCode,
+  deposit,
+  transfer,
 };
