@@ -22,26 +22,20 @@ module.exports = {
 
   updateBankAccount: {
     body: {
-      name: joi.string().required().label('Name'),
+      full_name: joi.string().required().label('Name'),
       email: joi.string().email().required().label('Email'),
+      access_password: joi.string().required().label('Access Password'),
+      access_password_confirm: joi
+        .string()
+        .required()
+        .label('Access Password Confirmation'),
     },
   },
 
   changeAccessPassword: {
     body: {
       access_password_old: joi.string().required().label('Old Access Password'),
-      access_password_new: joiPassword
-        .string()
-        .minOfSpecialCharacters(1)
-        .minOfLowercase(1)
-        .minOfUppercase(1)
-        .minOfNumeric(1)
-        .noWhiteSpaces()
-        .onlyLatinCharacters()
-        .min(6)
-        .max(12)
-        .required()
-        .label('New Access Password'),
+      access_password_new: joi.string().required().label('New Access Password'),
       access_password_confirm: joi
         .string()
         .required()

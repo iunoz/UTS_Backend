@@ -59,7 +59,7 @@ module.exports = (app) => {
   route.post(
     '/:id/change-pin-code',
     bankAuthenticationMiddleware,
-    celebrate(bankAccountsValidator.changeAccessPassword),
+    celebrate(bankAccountsValidator.changePinCode),
     bankAccountsControllers.changePinCode
   );
 };

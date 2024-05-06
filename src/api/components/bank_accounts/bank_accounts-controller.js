@@ -145,7 +145,7 @@ async function updateBankAccount(request, response, next) {
       );
     }
 
-    return response.status(200).json({ id });
+    return response.status(200).json({ message: 'Account has been updated' });
   } catch (error) {
     return next(error);
   }
@@ -266,7 +266,9 @@ async function changePinCode(request, response, next) {
       );
     }
 
-    return response.status(200).json({ id: request.params.id });
+    return response
+      .status(200)
+      .json({ id: request.params.id, message: 'Pin Code Updated Success' });
   } catch (error) {
     return next(error);
   }
