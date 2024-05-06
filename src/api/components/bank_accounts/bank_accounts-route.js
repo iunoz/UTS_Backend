@@ -1,6 +1,6 @@
 const express = require('express');
 
-const bankAuthenticationMiddleware = require('../../middlewares/bank_authentication-middleware');
+const bankAuthenticationMiddleware = require('../../middlewares/authentication-middleware');
 const celebrate = require('../../../core/celebrate-wrappers');
 const bankAccountsControllers = require('./bank_accounts-controller');
 const bankAccountsValidator = require('./bank_accounts-validator');

@@ -51,9 +51,9 @@ async function createBankAccount(request, response, next) {
   try {
     const full_name = request.body.full_name;
     const email = request.body.email;
-    const phone_number = request.body.password;
+    const phone_number = request.body.phone_number;
     const access_password = request.body.access_password;
-    const access_password_confirm = request.body.password_confirm;
+    const access_password_confirm = request.body.access_password_confirm;
     const pin_code = request.body.pin_code;
     const pin_code_confirm = request.body.pin_code_confirm;
     const card_number = request.body.card_number;
@@ -74,9 +74,9 @@ async function createBankAccount(request, response, next) {
       );
     }
 
-    // phone number must be unique
+    // email must be unique
     const emailIsRegistered =
-      await bankAccountsService.emailIsRegistered(phone_number);
+      await bankAccountsService.emailIsRegistered(email);
     if (emailIsRegistered) {
       throw errorResponder('Email is already registered');
     }
@@ -87,24 +87,32 @@ async function createBankAccount(request, response, next) {
     if (phoneNumberIsRegistered) {
       throw errorResponder('Phone number is already registered');
     }
-
-    const success = await bankAccountsService.createUser(
+    const account_number = Math.floor(1000000000 + Math.random() * 9000000000);
+    const success = await bankAccountsService.createBankAccount(
       full_name,
       email,
       phone_number,
       access_password,
       pin_code,
       card_number,
-      balance
+      balance,
+      account_number
     );
+
     if (!success) {
       throw errorResponder(
         errorTypes.UNPROCESSABLE_ENTITY,
-        'Failed to create user'
+        'Failed to create account'
       );
     }
 
-    return response.status(200).json({ name, email, balance });
+    return response.status(200).json({
+      full_name,
+      email,
+      phone_number,
+      card_number,
+      balance,
+    });
   } catch (error) {
     return next(error);
   }
@@ -120,7 +128,6 @@ async function createBankAccount(request, response, next) {
 async function updateBankAccount(request, response, next) {
   try {
     const id = request.params.id;
-    const name = request.body.name;
     const email = request.body.email;
 
     // Email must be unique
@@ -130,11 +137,7 @@ async function updateBankAccount(request, response, next) {
       throw errorResponder('Email is already registered');
     }
 
-    const success = await bankAccountsServiceService.updateBankAccount(
-      id,
-      name,
-      email
-    );
+    const success = await bankAccountsService.updateBankAccount(id, email);
     if (!success) {
       throw errorResponder(
         errorTypes.UNPROCESSABLE_ENTITY,
@@ -167,7 +170,7 @@ async function deleteBankAccount(request, response, next) {
       );
     }
 
-    return response.status(200).json({ id });
+    return response.status(200).json({ message: 'Customer has been delete' });
   } catch (error) {
     return next(error);
   }

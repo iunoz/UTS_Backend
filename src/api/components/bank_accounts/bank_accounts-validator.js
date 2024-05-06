@@ -5,40 +5,24 @@ const joiPassword = joi.extend(joiPasswordExtendCore);
 module.exports = {
   createBankAccount: {
     body: {
-      full_name: joi.string().min(1).max(100).required().label('Full Name'),
+      full_name: joi.string().required().label('Full Name'),
       email: joi.string().email().required().label('Email'),
-      phone_number: joi
-        .number()
-        .min(11)
-        .max(13)
-        .required()
-        .label('Phone Number'),
-      access_password: joiPassword
-        .string()
-        .minOfSpecialCharacters()
-        .minOfLowercase(1)
-        .minOfUppercase(1)
-        .minOfNumeric(1)
-        .noWhiteSpaces()
-        .onlyLatinCharacters()
-        .min(6)
-        .max(12)
-        .required()
-        .label('Access Password'),
+      phone_number: joi.number().required().label('Phone Number'),
+      access_password: joi.string().required().label('Access Password'),
       access_password_confirm: joi
         .string()
         .required()
-        .label('Access Password confirmation'),
-      pin_code: joi.number().min(6).max(6).required().label('Pin Code'),
-      pin_code_confirm: joi.number().required().label('Pin Code Confirmation'),
-      card_number: joi.number().min(16).max(16).label('Card Number'),
-      balance: joi.number().min(1).max(100).required().label('Balance'),
+        .label('Access Password Confirmation'),
+      pin_code: joi.string().required().label('Pin Code'),
+      pin_code_confirm: joi.string().required().label('Pin Code Confirmation'),
+      card_number: joi.number().label('Card Number'),
+      balance: joi.number().required().label('Balance'),
     },
   },
 
   updateBankAccount: {
     body: {
-      name: joi.string().min(1).max(100).required().label('Name'),
+      name: joi.string().required().label('Name'),
       email: joi.string().email().required().label('Email'),
     },
   },
@@ -48,7 +32,7 @@ module.exports = {
       access_password_old: joi.string().required().label('Old Access Password'),
       access_password_new: joiPassword
         .string()
-        .minOfSpecialCharacters()
+        .minOfSpecialCharacters(1)
         .minOfLowercase(1)
         .minOfUppercase(1)
         .minOfNumeric(1)
@@ -67,8 +51,8 @@ module.exports = {
 
   changePinCode: {
     body: {
-      pin_code_old: joi.number().required().label('Old Pin Code'),
-      pin_code_new: joi.number().min(6).max(6).required().label('NewPin Code'),
+      pin_code_old: joi.string().required().label('Old Pin Code'),
+      pin_code_new: joi.string().required().label('NewPin Code'),
       pin_code_confirm: joi.string().required().label('Pin Code Confirmation'),
     },
   },

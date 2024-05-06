@@ -13,7 +13,9 @@ passport.use(
       secretOrKey: config.secret.jwt,
     },
     async (payload, done) => {
-      const bankAccount = await BankAccount.findOne({ id: payload.user_id });
+      const bankAccount = await BankAccount.findOne({
+        id: payload.bankAccount_id,
+      });
       return bankAccount ? done(null, bankAccount) : done(null, false);
     }
   )

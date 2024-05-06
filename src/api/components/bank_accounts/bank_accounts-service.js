@@ -1,10 +1,6 @@
 const bankAccountsRepository = require('./bank_accounts-repository');
-const {
-  hashAccessPassword,
-  accessPasswordMatched,
-  hashPinCode,
-  pinCodeMatched,
-} = require('../../../utils/password');
+const { hashPassword, passwordMatched } = require('../../../utils/password');
+const { account_number } = require('../../../models/bank_accounts-schema');
 
 /**
  * Get list of bank account
@@ -25,6 +21,7 @@ async function getBankAccounts() {
       pin_code: bankAccount.pin_code,
       card_number: bankAccount.card_number,
       balance: bankAccount.balance,
+      account_number: bankAccount.account_number,
     });
   }
 
@@ -37,7 +34,7 @@ async function getBankAccounts() {
  * @returns {Object}
  */
 async function getBankAccount(id) {
-  const bankAccount = await usersRepository.getBankAccount(id);
+  const bankAccount = await bankAccountsRepository.getBankAccount(id);
 
   // User not found
   if (!bankAccount) {
@@ -62,7 +59,7 @@ async function getBankAccount(id) {
  * @param {string} email - Email
  * @param {number} phone_number - Phone Number
  * @param {string} access_password - Hashed access_password
- * @param {number} pin_code - Hashed Pin Code
+ * @param {string} pin_code - Hashed Pin Code to hash must string
  * @param {number} card_number - Card Number
  * @param {number} balance - Amount of balance
  * @returns {boolean}
@@ -74,20 +71,22 @@ async function createBankAccount(
   access_password,
   pin_code,
   card_number,
-  balance
+  balance,
+  account_number
 ) {
   // Hash access password and hash pin code
   const hashedAccessPassword = await hashPassword(access_password);
   const hashedPinCode = await hashPassword(pin_code);
   try {
-    await usersRepository.createBankAccount(
+    await bankAccountsRepository.createBankAccount(
       full_name,
       email,
       phone_number,
       hashedAccessPassword,
       hashedPinCode,
       card_number,
-      balance
+      balance,
+      account_number
     );
   } catch (err) {
     return null;
@@ -103,7 +102,7 @@ async function createBankAccount(
  * @returns {boolean}
  */
 async function updateBankAccount(id, email) {
-  const bankAccount = await bankAccountsRepository.getUser(id);
+  const bankAccount = await bankAccountsRepository.getBankAccount(id);
 
   // Bank account not found
   if (!bankAccount) {
@@ -143,7 +142,7 @@ async function deleteBankAccount(id) {
 
 /**
  * Check whether the email is registered
- * @param {number} email - email
+ * @param {string} email - email
  * @returns {boolean}
  */
 async function emailIsRegistered(email) {
@@ -181,19 +180,19 @@ async function phoneNumberIsRegistered(phone_number) {
 async function checkAccessPassword(bankAccountId, access_password) {
   const bankAccount =
     await bankAccountsRepository.getBankAccount(bankAccountId);
-  return accessPasswordMatched(access_password, bankAccount.password);
+  return passwordMatched(access_password, bankAccount.access_password);
 }
 
 /**
  * Check whether the pin code is correct
  * @param {string} bankAccountId - User ID
- * @param {number} pin_code - Pin code
+ * @param {string} pin_code - Pin code
  * @returns {boolean}
  */
 async function checkPinCode(bankAccountId, pin_code) {
   const bankAccount =
     await bankAccountsRepository.getBankAccount(bankAccountId);
-  return pinCodeMatched(pin_code, bankAccount.pin_code);
+  return passwordMatched(pin_code, bankAccount.pin_code);
 }
 
 /**
@@ -211,7 +210,7 @@ async function changeAccessPassword(bankAccountId, access_password) {
     return null;
   }
 
-  const hashedAccessPassword = await hashAccessPassword(access_password);
+  const hashedAccessPassword = await hashPassword(access_password);
 
   const changeAccessPasswordSuccess =
     await bankAccountsRepository.changeAccessPassword(
@@ -229,7 +228,7 @@ async function changeAccessPassword(bankAccountId, access_password) {
 /**
  * Change bank account pin code
  * @param {string} bankAccountId - Bank Account ID
- * @param {number} pin_code - pin_code
+ * @param {string} pin_code - pin_code
  * @returns {boolean}
  */
 async function changePinCode(bankAccountId, pin_code) {
@@ -241,7 +240,7 @@ async function changePinCode(bankAccountId, pin_code) {
     return null;
   }
 
-  const hashedPinCode = await hashPinCode(pin_code);
+  const hashedPinCode = await hashPassword(pin_code);
 
   const changePinCodeSuccess = await bankAccountsRepository.changePinCode(
     bankAccountId,

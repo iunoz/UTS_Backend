@@ -23,8 +23,10 @@ async function getBankAccount(id) {
  * @param {string} email - Email
  * @param {number} phone_number - Phone Number
  * @param {string} access_password - Hashed access_password
- * @param {number} pin_code - Hashed Pin Code
+ * @param {string} pin_code - Hashed Pin Code must string to hash
+ * @param {string} card_number - Card number
  * @param {number} balance - Amount of balance
+ * @param {number} account_number - Account Number
  * @returns {Promise}
  */
 async function createBankAccount(
@@ -33,7 +35,9 @@ async function createBankAccount(
   phone_number,
   access_password,
   pin_code,
-  balance
+  card_number,
+  balance,
+  account_number
 ) {
   return BankAccount.create({
     full_name,
@@ -41,7 +45,9 @@ async function createBankAccount(
     phone_number,
     access_password,
     pin_code,
+    card_number,
     balance,
+    account_number,
   });
 }
 
